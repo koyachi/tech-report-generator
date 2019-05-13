@@ -1,0 +1,10 @@
+{
+  "dataSourceName": "user:password@/dbname?charset=utf8&parseTime=True&loc=Local",
+  "googleServiceAccountCredentials": "base64 string of google service account",
+  "fabricAccount": "user:password",
+  "newrelicAccount": "user:password",
+  "pagerdutyAccount": "user:password"
+  "organization": "string",
+  "iosApp": "string",
+  "androidApp": "string"
+}
