@@ -8,13 +8,13 @@ import (
 	"time"
 
 	"github.com/chromedp/chromedp"
-	"github.com/liyy7/chromedp-samples/samples/fabric"
-	"github.com/liyy7/chromedp-samples/samples/newrelic"
-	"github.com/liyy7/chromedp-samples/samples/pagerduty"
+	"github.com/li-go/chromedp-samples/samples/fabric"
+	"github.com/li-go/chromedp-samples/samples/newrelic"
+	"github.com/li-go/chromedp-samples/samples/pagerduty"
 	"github.com/spf13/viper"
 
-	"github.com/liyy7/tech-report-generator/config"
-	"github.com/liyy7/tech-report-generator/reports"
+	"github.com/li-go/tech-report-generator/config"
+	"github.com/li-go/tech-report-generator/reports"
 )
 
 func main() {

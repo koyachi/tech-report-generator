@@ -9,7 +9,7 @@ import (
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/sheets/v4"
 
-	"github.com/liyy7/tech-report-generator/config"
+	"github.com/li-go/tech-report-generator/config"
 )
 
 type WeeklyUU struct {

@@ -7,7 +7,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/pkg/errors"
 
-	"github.com/liyy7/tech-report-generator/config"
+	"github.com/li-go/tech-report-generator/config"
 )
 
 func GetAppWeeklyWannago(untilDate time.Time) (int, error) {
