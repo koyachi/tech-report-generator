@@ -7,14 +7,15 @@ import (
 	"os"
 	"time"
 
-	"github.com/chromedp/chromedp"
 	"github.com/li-go/chromedp-samples/samples/fabric"
 	"github.com/li-go/chromedp-samples/samples/newrelic"
 	"github.com/li-go/chromedp-samples/samples/pagerduty"
-	"github.com/spf13/viper"
 
 	"github.com/li-go/tech-report-generator/config"
 	"github.com/li-go/tech-report-generator/reports"
+
+	"github.com/chromedp/chromedp"
+	"github.com/spf13/viper"
 )
 
 func main() {
@@ -28,11 +29,7 @@ func main() {
 		return
 	}
 
-	chromedp.DefaultExecAllocatorOptions = []chromedp.ExecAllocatorOption{
-		chromedp.NoFirstRun,
-		chromedp.NoDefaultBrowserCheck,
-	}
-	ctx, cancel := chromedp.NewContext(context.Background(), chromedp.WithLogf(logger.Printf))
+	ctx, cancel := newChromedp(true)
 	defer cancel()
 
 	printAppWeeklyUU(logger)
@@ -40,6 +37,28 @@ func main() {
 	printFreeUsersRate(ctx, logger)
 	printErrorRate(ctx, logger)
 	printOncallCount(ctx, logger)
+}
+
+func newChromedp(headless bool) (context.Context, context.CancelFunc) {
+	var opts []chromedp.ExecAllocatorOption
+	for _, opt := range chromedp.DefaultExecAllocatorOptions {
+		opts = append(opts, opt)
+	}
+	if headless {
+		opts = append(opts,
+			chromedp.Flag("headless", false),
+			chromedp.Flag("hide-scrollbars", false),
+			chromedp.Flag("mute-audio", false),
+		)
+	}
+
+	allocCtx, allocCancel := chromedp.NewExecAllocator(context.Background(), opts...)
+	ctx, cancel := chromedp.NewContext(allocCtx, chromedp.WithLogf(log.Printf))
+
+	return ctx, func() {
+		cancel()
+		allocCancel()
+	}
 }
 
 func printAppWeeklyUU(logger *log.Logger) {
