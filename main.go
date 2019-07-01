@@ -7,15 +7,14 @@ import (
 	"os"
 	"time"
 
+	"github.com/chromedp/chromedp"
 	"github.com/li-go/chromedp-samples/samples/fabric"
 	"github.com/li-go/chromedp-samples/samples/newrelic"
 	"github.com/li-go/chromedp-samples/samples/pagerduty"
+	"github.com/spf13/viper"
 
 	"github.com/li-go/tech-report-generator/config"
 	"github.com/li-go/tech-report-generator/reports"
-
-	"github.com/chromedp/chromedp"
-	"github.com/spf13/viper"
 )
 
 func main() {
