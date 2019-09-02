@@ -130,7 +130,7 @@ func printErrorRate(ctx context.Context, logger *log.Logger) {
 	}
 	fmt.Printf("ErrorRate: %f%%\n", errorRate)
 
-	appPerformance, err := n.GetAppPerformance(ctx, "5b225765625472616e73616374696f6e2f526571756573744174747269627574652f76352e342f6170702f6d652f66656564202847455429202d206a6170616e222c22225d")
+	appPerformance, err := n.GetAppPerformance(ctx, "5b225765625472616e73616374696f6e2f526571756573744174747269627574652f76352e352f6170702f6d652f66656564202847455429202d206a6170616e222c22225d")
 	if err != nil {
 		logger.Printf("printErrorRate: %+v", err)
 		return
