@@ -20,6 +20,10 @@ func GetDataSourceName() (string, error) {
 	return getConfig("dataSourceName")
 }
 
+func GetCountQuery() (string, error) {
+	return getConfig("countQuery")
+}
+
 func GetGoogleServiceAccountCredentials() ([]byte, error) {
 	credentials, err := getConfig("googleServiceAccountCredentials")
 	if err != nil {
@@ -30,6 +34,14 @@ func GetGoogleServiceAccountCredentials() ([]byte, error) {
 		return nil, errors.WithStack(err)
 	}
 	return bs, nil
+}
+
+func GetSpreadsheetID() (string, error) {
+	return getConfig("spreadsheetID")
+}
+
+func GetSpreadsheetTabName() (string, error) {
+	return getConfig("spreadsheetTabName")
 }
 
 func getAccount(name string) (string, string, error) {
@@ -48,22 +60,30 @@ func GetFabricAccount() (string, string, error) {
 	return getAccount("fabric")
 }
 
+func GetFabricOrganization() (string, error) {
+	return getConfig("fabricOrganization")
+}
+
+func GetIOSAppScheme() (string, error) {
+	return getConfig("iosAppScheme")
+}
+
+func GetAndroidAppScheme() (string, error) {
+	return getConfig("androidAppScheme")
+}
+
 func GetNewrelicAccount() (string, string, error) {
 	return getAccount("newrelic")
+}
+
+func GetNewrelicTransactionID() (string, error) {
+	return getConfig("newrelicTransactionID")
 }
 
 func GetPagerdutyAccount() (string, string, error) {
 	return getAccount("pagerduty")
 }
 
-func GetOrganization() (string, error) {
-	return getConfig("organization")
-}
-
-func GetIOSApp() (string, error) {
-	return getConfig("iosApp")
-}
-
-func GetAndroidApp() (string, error) {
-	return getConfig("androidApp")
+func GetPagerdutyOrganization() (string, error) {
+	return getConfig("pagerdutyOrganization")
 }

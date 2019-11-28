@@ -1,7 +1,7 @@
 FROM golang
 
 LABEL name="chrome-headless & golang" \
-    maintainer="liyy7 <aleeyyu@gmail.com>" \
+    maintainer="li-go <aleeyyu+01@gmail.com>" \
     version="1.0" \
     description="Google Chrome Headless & golang in a container"
 

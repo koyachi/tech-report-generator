@@ -1,6 +1,7 @@
 package reports
 
 import (
+	"strings"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -25,13 +26,13 @@ func GetAppWeeklyWannago(untilDate time.Time) (int, error) {
 	db.LogMode(false)
 
 	var count int
-	var replyScore = struct {
-		ReplyScoreType   int
-		ReplyScoreStatus int
-	}{2, 1}
-	if err := db.Table("reply_score").
-		Where(replyScore).Where("create_datetime BETWEEN ? -INTERVAL 7 DAY AND ?", untilDate, untilDate).
-		Count(&count).Error; err != nil {
+	query, err := config.GetCountQuery()
+	if err != nil {
+		return 0, errors.WithStack(err)
+	}
+	query = strings.ReplaceAll(query, "%DATE_PLACEHOLDER%", untilDate.String())
+	row := db.Raw(query).Row()
+	if err := row.Scan(&count); err != nil {
 		return 0, errors.WithStack(err)
 	}
 	return count, nil

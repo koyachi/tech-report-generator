@@ -20,30 +20,30 @@ import (
 func main() {
 	logger := log.New(os.Stdout, "[TRGen] ", log.LstdFlags|log.Lshortfile)
 
-	viper.SetConfigName(".config") // name of config file (without extension)
-	viper.AddConfigPath(".")       // optionally look for config in the working directory
-	err := viper.ReadInConfig()    // Find and read the config file
-	if err != nil {                // Handle errors reading the config file
-		logger.Printf("need valid config file: %+v", err)
-		return
+	viper.SetConfigName(".config")
+	viper.AddConfigPath(".")
+	err := viper.ReadInConfig()
+	if err != nil {
+		logger.Fatalf("need valid config file: %+v", err)
 	}
 
-	ctx, cancel := newChromedp(true)
-	defer cancel()
-
-	printAppWeeklyUU(logger)
+	ctx := context.Background()
+	printAppWeeklyUU(ctx, logger)
 	printAppWeeklyWannago(logger)
+
+	ctx, cancel := newChromedp(ctx, false)
+	defer cancel()
 	printFreeUsersRate(ctx, logger)
 	printErrorRate(ctx, logger)
 	printOncallCount(ctx, logger)
 }
 
-func newChromedp(headless bool) (context.Context, context.CancelFunc) {
+func newChromedp(ctx context.Context, headless bool) (context.Context, context.CancelFunc) {
 	var opts []chromedp.ExecAllocatorOption
 	for _, opt := range chromedp.DefaultExecAllocatorOptions {
 		opts = append(opts, opt)
 	}
-	if headless {
+	if !headless {
 		opts = append(opts,
 			chromedp.Flag("headless", false),
 			chromedp.Flag("hide-scrollbars", false),
@@ -51,7 +51,7 @@ func newChromedp(headless bool) (context.Context, context.CancelFunc) {
 		)
 	}
 
-	allocCtx, allocCancel := chromedp.NewExecAllocator(context.Background(), opts...)
+	allocCtx, allocCancel := chromedp.NewExecAllocator(ctx, opts...)
 	ctx, cancel := chromedp.NewContext(allocCtx, chromedp.WithLogf(log.Printf))
 
 	return ctx, func() {
@@ -60,8 +60,8 @@ func newChromedp(headless bool) (context.Context, context.CancelFunc) {
 	}
 }
 
-func printAppWeeklyUU(logger *log.Logger) {
-	appWeeklyUU, err := reports.GetAppWeeklyUU()
+func printAppWeeklyUU(ctx context.Context, logger *log.Logger) {
+	appWeeklyUU, err := reports.GetAppWeeklyUU(ctx)
 	if err != nil {
 		logger.Printf("printAppWeeklyUU: %+v", err)
 		return
@@ -70,14 +70,13 @@ func printAppWeeklyUU(logger *log.Logger) {
 }
 
 func printAppWeeklyWannago(logger *log.Logger) {
-	year, month, day := time.Now().Date()
-	untilDate := time.Date(year, month, day, 0, 0, 0, 0, time.Local)
+	untilDate := time.Now().Truncate(24 * time.Hour)
 	wannago, err := reports.GetAppWeeklyWannago(untilDate)
 	if err != nil {
 		logger.Printf("printAppWeeklyWannago: %+v", err)
 		return
 	}
-	fmt.Printf("%d-%d-%d週行きたい: %d\n", year, month, day, wannago)
+	fmt.Printf("%s週行きたい: %d\n", untilDate.Format("2006-01-02"), wannago)
 }
 
 func printFreeUsersRate(ctx context.Context, logger *log.Logger) {
@@ -92,16 +91,30 @@ func printFreeUsersRate(ctx context.Context, logger *log.Logger) {
 		return
 	}
 
-	organization, _ := config.GetOrganization()
-	iosApp, _ := config.GetIOSApp()
-	androidApp, _ := config.GetAndroidApp()
-
-	iosCrashFreeUsers, err := f.GetIOSCrashFreeUsers(ctx, organization, iosApp)
+	organization, err := config.GetFabricOrganization()
 	if err != nil {
 		logger.Printf("printFreeUsersRate: %+v", err)
 		return
 	}
-	androidCrashFreeUsers, err := f.GetAndroidCrashFreeUsers(ctx, organization, androidApp)
+
+	iosAppScheme, err := config.GetIOSAppScheme()
+	if err != nil {
+		logger.Printf("printFreeUsersRate: %+v", err)
+		return
+	}
+
+	androidAppScheme, err := config.GetAndroidAppScheme()
+	if err != nil {
+		logger.Printf("printFreeUsersRate: %+v", err)
+		return
+	}
+
+	iosCrashFreeUsers, err := f.GetIOSCrashFreeUsers(ctx, organization, iosAppScheme)
+	if err != nil {
+		logger.Printf("printFreeUsersRate: %+v", err)
+		return
+	}
+	androidCrashFreeUsers, err := f.GetAndroidCrashFreeUsers(ctx, organization, androidAppScheme)
 	if err != nil {
 		logger.Printf("printFreeUsersRate: %+v", err)
 		return
@@ -130,7 +143,13 @@ func printErrorRate(ctx context.Context, logger *log.Logger) {
 	}
 	fmt.Printf("ErrorRate: %f%%\n", errorRate)
 
-	appPerformance, err := n.GetAppPerformance(ctx, "5b225765625472616e73616374696f6e2f526571756573744174747269627574652f76352e352f6170702f6d652f66656564202847455429202d206a6170616e222c22225d")
+	transactionID, err := config.GetNewrelicTransactionID()
+	if err != nil {
+		logger.Printf("printErrorRate: %+v", err)
+		return
+	}
+
+	appPerformance, err := n.GetAppPerformance(ctx, transactionID)
 	if err != nil {
 		logger.Printf("printErrorRate: %+v", err)
 		return
@@ -149,7 +168,11 @@ func printOncallCount(ctx context.Context, logger *log.Logger) {
 		return
 	}
 
-	organization, _ := config.GetOrganization()
+	organization, err := config.GetPagerdutyOrganization()
+	if err != nil {
+		logger.Printf("printOncallCount: %+v", err)
+		return
+	}
 
 	if err := p.Login(ctx, organization, user, pass); err != nil {
 		logger.Printf("printOncallCount: %+v", err)

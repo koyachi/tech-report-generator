@@ -1,10 +1,15 @@
 {
   "dataSourceName": "user:password@/dbname?charset=utf8&parseTime=True&loc=Local",
+  "countQuery": "SELECT COUNT(*) FROM table WHERE created_at BETWEEN '%DATE_PLACEHOLDER%' -INTERVAL 7 DAY AND '%DATE_PLACEHOLDER%'",
   "googleServiceAccountCredentials": "base64 string of google service account",
+  "spreadsheetID": "spreadsheet id",
+  "spreadsheetTabName": "spreadsheet tab name",
   "fabricAccount": "user:password",
+  "fabricOrganization": "string",
+  "iosAppScheme": "string",
+  "androidAppScheme": "string",
   "newrelicAccount": "user:password",
-  "pagerdutyAccount": "user:password"
-  "organization": "string",
-  "iosApp": "string",
-  "androidApp": "string"
+  "newrelicTransactionID": "transaction id",
+  "pagerdutyAccount": "user:password",
+  "pagerdutyOrganization": "string"
 }
