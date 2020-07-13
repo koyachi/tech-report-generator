@@ -9,7 +9,8 @@ import (
 
 	"github.com/chromedp/chromedp"
 	"github.com/li-go/chromedp-samples/samples/fabric"
-	"github.com/li-go/chromedp-samples/samples/newrelic"
+	//"github.com/li-go/chromedp-samples/samples/newrelic"
+	"github.com/koyachi/chromedp-samples/samples/newrelic"
 	"github.com/li-go/chromedp-samples/samples/pagerduty"
 	"github.com/spf13/viper"
 
@@ -33,7 +34,8 @@ func main() {
 
 	ctx, cancel := newChromedp(ctx, false)
 	defer cancel()
-	printFreeUsersRate(ctx, logger)
+	// skip fabric
+	//printFreeUsersRate(ctx, logger)
 	printErrorRate(ctx, logger)
 	printOncallCount(ctx, logger)
 }
